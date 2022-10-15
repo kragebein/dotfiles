@@ -1,0 +1,14 @@
+#!/bin/bash
+
+storage="/home/krage/Pictures"
+name="$(date).png"
+newname="$(echo "$name" |sed -e 's/ /_/g')"
+file="$storage/$newname"
+
+if $(grim -c -g "$(slurp)" - >> "$file"); then
+	cat "$file" |wl-copy
+	notify-send --icon="$file" --app-name="Screenshot" "Screenshot" "saved as $newname\nCopied to clipboard"
+else
+	notify-send --app-name="Screenshot" "Screenshot" "Action was aborted by user"
+fi
+	
