@@ -1,0 +1,13 @@
+# Main display, left monitor, 300 pixels higher up than left.
+monitor=DP-4,3440x1440@74.98,0x300,1
+
+# Secondary portrait monitor, 3440 pixels left of main
+monitor=DP-6,1920x1200@59.95,3440x0,1
+monitor=DP-6,transform,1
+
+# Bind workspace 10 to left monitor.
+workspace=DP-6,10
+wsbind=10,DP-6
+
+# Disable laptop monitor.
+monitor=eDP-1,disable
