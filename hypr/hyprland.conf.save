@@ -1,154 +1,216 @@
 # Hyprland config file.
+exec-once=dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec-once=systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+# Gnome policykit is segfaulting
+# exec-once=/usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1
+exec-once=lxpolkit # GTK2.
+exec-once=gnome-keyring-daemon -sd
+exec-once=/usr/libexec/xdg-desktop-portal-wlr
+exec-once=/usr/libexec/geoclue-2.0/demos/agent
+exec-once=swayidle timeout 180 swaylock
+exec-once=swaync
+exec-once=/usr/bin/redshift-gtk 
+#exec-once=kanshi
 
-exec-once=systemctl --user import-environment DISPLAY WAYLAND_DISPLAY SWAYSOCK
-exec-once=hash dbus-update-activation-environment 2>/dev/null && \
-     dbus-update-activation-environment --systemd DISPLAY WAYLAND_DISPLAY SWAYSOCK
-exec-once=ulauncher
+# Background
 
+exec-once=changebg # changebg invokes hyprpaper.
 
-$wallpaper=~/Pictures/Wallpapers/z-w-gu-canal.jpg
-$term=kitty
-$floating_term=alacritty
+$term=gnome-terminal
+$floating_term=gnome-terminal
 $editor=code
-$notetaker=logseq
-$chat=slack
 $mailer=evolution
-$music=~/bin/qobuz
-$browser=MOZ_ENABLE_WAYLAND=1 microsoft-edge-stable
+$browser=MOZ_ENABLE_WAYLAND=1 firefox
 $filemanager=nemo
-$passwordmanager=~/bin/Buttercup-linux-x64.AppImage
-$calendar=~/bin/calendar
-# set $calendar flatpak run com.microsoft.Teams
-$videcon=XDG_SESSION_TYPE=x11 XDG_CURRENT_DESKTOP=gnome flatpak run us.zoom.Zoom
-$locker=swaylock -f -e -l -L -s fill -i $wallpaper
-$suspend_and_lock=swaylock -f -e -l -L -s fill -i $wallpaper && sleep 2 && systemctl suspend
+$locker=swaylock
+$suspend_and_lock=swaylock
+$connectionmanager=LANG=en_US /usr/share/gnome-connection-manager/gnome_connection_manager.py
 
-monitor=DP-4,920x1200@60000,1920,0,1
-monitor=DP-5,3440x1440@99982,3120,220,1
-monitor=eDP-1,1920x1080@60006,6560,840,1
-workspace=eDP-1,1
-workspace=DP-5,2
-workspace=DP-4,3
 
-# monitor=DP-1,3840x2160@30,0x0,1
-# monitor=eDP-1,2560x1440@60,610x2160,1
-# workspace=DP-1,1
-# workspace=eDP-1,2
+## Monitor setup.
 
-# monitor=HDMI-A-1,1920x1080@60,0x0,0.75
-# monitor=eDP-1,2560x1440@60,0x1440,1
-# workspace=HDMI-A-1,1
-# workspace=eDP-1,2
-# monitor=HDMI-A-1,disable
-# monitor=eDP-1,transform,0
+$center_monitor=desc:Philips Consumer Electronics Company PHL 346E2C UK02202038620
+$left_monitor=desc:Dell Inc. DELL U2412M YPPY098R2SML
 
-# monitor=eDP-1,addreserved,0,0,60,0
+# Main display, left monitor, 370 pixels lower than left top
+#monitor=$center_monitor,3440x1440@74.98,0x480,1
 
-# exec-once=kanshi
+# Secondary portrait monitor, 3440 pixels left of main
+#monitor=$left_monitor,1920x1200@59.95,3440x0,1
+#monitor=$left_monitor,transform,1
 
-# monitor=eDP-1,2560x1440@60,0x0,1
-# workspace=eDP-1,1
+# Bind workspace 10 to left monitor.
+#workspace=$left_monitor,10
+#wsbind=10,$left_monitor
+
+# Disable laptop monitor.
+#monitor=eDP-1,disable
+
+monitor=eDP-1,1920x1080@60.00,0x0,1
+
+## Input setup
 
 input {
+    # Keyboard
     kb_layout=no
     kb_variant=
     kb_model=
-    kb_options=ctrl:nocaps,compose:ralt
+    kb_options=ctrl
     kb_rules=evdev
-
-    natural_scroll=1
+    numlock_by_default=1
+    
+    # Mouse
+    force_no_accel=0
+    natural_scroll=0
     follow_mouse=1
     repeat_delay=250
     repeat_rate=30
+    accel_profile=adaptive
 #    disable_while_typing=1
 }
+
+## General Layout setup.
 
 general {
     sensitivity=1.0
     main_mod=SUPER
-
-    gaps_in=14 #8
-    gaps_out=20 #10
-    border_size=3
-    col.active_border=0x88ff1111
-    col.inactive_border=0x88aaaaaa
-
-    damage_tracking=full # experimental, monitor is 100% fine, but full might have some minor bugs, especially with high blur settings!
+    layout=dwindle
+    gaps_in=10 #8
+    gaps_out=12 #10
+    border_size=2
+    col.active_border=0xFF53E2AE
+    col.inactive_border=0xFFF48FB1
 }
+
+## Fancy Smancy blur and shadow stuff.
 
 decoration {
-    rounding=10
-    blur=0
-    blur_size=8 # minimum 1
-    blur_passes=1 # minimum 1, more passes = more resource intensive.
-    # Your blur "amount" is blur_size * blur_passes, but high blur_size (over around 5-ish) will produce artifacts.
-    # if you want heavy blur, you need to up the blur_passes.
-    # the more passes, the more you can up the blur_size without noticing artifacts.
-}
+    # Shadow stuff
+    drop_shadow=1
+    shadow_range=20
+    shadow_ignore_window=1
+    shadow_render_power=2
+    shadow_offset=8 8
+    shadow_scale=1
+#    col.shadow = 0x8000000
+
+    # Blur stuff
+    blur_new_optimizations=1
+    rounding=12
+    blur=1
+    blur_size=2 # minimum 1
+    blur_passes=3
+
+    # Window dimming
+    dim_inactive=0
+    dim_strength=0
+    }
+
+## Bezier Curves
+
+bezier=slow,0,0.85,0.3,1
+bezier=overshot,0.7,0.6,0.1,1.1
+bezier=slingshot,1,-1,0.15,1.25
+bezier=nice,0,6.9,0.5,-4.20
+
+## Animations
 
 animations {
     enabled=1
-    animation=windows,1,3,default
-    animation=borders,1,3,default
-    animation=fadein,1,3,default
-    animation=workspaces,1,3,slide
+    animation=windows,1,5,overshot,slide
+    animation=border,1,10,default
+    animation=fade,1,10,default
+    animation=workspaces,1,5,overshot,slide
+    animation=specialWorkspace,1,5,overshot,slidevert
 }
+
+#blurls=waybar
+blurls=rofi
+blurls=wofi
+#blurls=gtk-layer-shell
+blurls=wallpapers
 
 dwindle {
     pseudotile=0 # enable pseudotiling on dwindle
+    special_scale_factor=0.8
+    preserve_split=0
+    force_split=0
+    use_active_for_splits=0
 }
 
-# example window rules
-# for windows named/classed as abc and xyz
-#windowrule=move 69 420,abc
-#windowrule=tile,xyz
-#windowrule=float,abc
-#windowrule=pseudo,abc
-#windowrule=monitor 0,xyz
+misc {
+    disable_hyprland_logo=1
+    no_vfr=yes
+    animate_manual_resizes=0
+}
+
+debug {
+    overlay=no
+    damage_blink=0
+    disable_logs=0
+    disable_time=1
+}
 
 # WINDOW RULES
+
+windowrule=workspace special silent,discord
+windowrule=workspace special silent,Spotify
+windowrule=workspace special silent,Caprine
+windowrule=workspace 10 silent,Slack
+windowrule=workspace 10 silent,Microsoft
+
+windowrule=float,title:Google
+windowrule=float,1Password
+windowrule=float,App.py
+windowrule=float,app.py
+windowrule=float,audible-for-linux
+windowrule=float,gnome_connection_manager
+windowrule=float,Zenity
+windowrule=float,SMS
 windowrule=float,rofi
-windowrule=float,thunar
-windowrule=float,Alacritty
-windowrule=float,Buttercup
-windowrule=float,zoom
-windowrule=float,nwg-look
-windowrule=float,Skype
+windowrule=float,code
+windowrule=tile,VirtualBox
+windowrule=float,evolution
+windowrule=float,VPN
+windowrule=float,nemo
+windowrule=float,Google-chrome
+windowrule=float,kitty
+#windowrule=noshadow,^(kitty)$
+windowrule=noborder,kitty
+windowrule=noshadow,kitty
+#windowrulev2=bordercolor rgba(b3ff1a00) rgba(b3ff1a00),class:^(kitty)$
 windowrule=float,baobab
 windowrule=float,org.gnome.Settings
 windowrule=float,file-roller
 windowrule=float,Pcmanfm
+windowrule=float,pamac-manager
 windowrule=float,diffuse
-windowrule=float,smerge
 windowrule=float,guvcview
 windowrule=float,imv
 windowrule=float,nwg-panel
-windowrule=float,azote
-windowrule=float,gcolor
 windowrule=float,gucharmap
 windowrule=float,gnome-font
 windowrule=float,Lxappearance
 windowrule=float,obs
-windowrule=float,zathura
-windowrule=float,meld
-windowrule=float,feh
 windowrule=float,gnome-calculator
 windowrule=float,DesktopEditors
-windowrule=float,Sxiv
-windowrule=float,Nsxiv
-windowrule=float,celluloid
 windowrule=float,wdisplays
+windowrule=float,pavucontrol
 windowrule=size 1000 800,wdisplays
-windowrule=opacity 0.90,subl
-windowrule=opacity 0.90,kitty
-windowrule=opacity 0.90,code
-windowrule=opacity 0.80,alacritty
-windowrule=opacity 0.80,rofi
+windowrule=opacity 0.90 0.90,subl
+windowrule=opacity 0.90 0.90,alacritty
+windowrule=opacity 0.80 0.90,wofi
+windowrule=opacity 0.90 0.90,foot
+windowrule=float,launchar
+#windowrule=opaque,Xterm
 
 # APP BINDS
-bind=SUPERALT,T,exec,$term
-bind=SUPER,return,exec,$floating_term
-bind=SUPERALT,Y,exec,$floating_term -e yorick
+
+#bind = SUPER, E, exec, [workspace 2 silent;float] dolphin
+
+bind=SUPERSHIFT,S,exec,$sendsms
+bind=SUPERSHIFT,Q,exec, wlogout
+bind=SUPER,return,exec,$term
 bind=SUPERALT,F,exec,$filemanager
 bind=SUPERALT,B,exec,$browser
 bind=SUPERALT,M,exec,$mailer
@@ -157,96 +219,83 @@ bind=SUPERALT,O,exec,$notetaker
 bind=SUPERALT,E,exec,$editor
 bind=SUPERALT,C,exec,$calendar
 bind=SUPERALT,P,exec,$passwordmanager
-bind=SUPERALT,Q,exec,pkill Hyprland
+bind=SUPER,S,exec,$connectionmanager
+#bind=SUPERALT,Q,exec,pkill Hyprland
+
 
 # GENERAL WINDOWS OPERATIONS
-bind=SUPER,S,togglefloating,
+
+bindm=SUPER,mouse:272,movewindow
+bindm=SUPER,mouse:273,resizewindow
+
+# Group
 bind=SUPER,G,togglegroup,
-bind=SUPER,C,changegroupactive,
-bind=SUPER,R,togglesplit,
-bind=SUPER,Z,exec,/home/frigaut/bin/myrofi
+bind=SUPER,H,changegroupactive,
+
+
+bind=SUPER,C,killactive,
+bind=SUPER,Q,exec,$floating_term
+bind=SUPER,M,exit,
+bind=SUPER,E,exec,nemo
+bind=SUPER,V,togglefloating,
+bind=SUPER,R,exec,launchar
+#bind=SUPER,R,exec,wofi --show drun
+bind=SUPERSHIFT,R, exec, wofi --show run
 bind=SUPER,P,pseudo,
 bind=SUPER,F,fullscreen,
-bind=SUPER,L,exec,swaylock -f -e -l -L -s fill -i $wallpaper
-bind=SUPER,X,exec,farge --notify
-bind=SUPERSHIFT,L,exec,swaylock -f -e -l -L -s fill -i $wallpaper; sleep 1; systemctl suspend -i
-bind=ALT,W,killactive,
-bind=SUPER,delete,exec,rofi -show power-menu -modi power-menu:rofi-power-menu -font "iosevka 24"
+bind=SUPER,L,exec,swaylock
+bind=SUPERCTRL,Q,exec,wlogout
 bind=SUPERSHIFT,N,exec,swaync-client -t -sw
-bind=,XF86Display,exec,wdisplays
-
-# WINDOWS FOCUS AND MOVES
-bind=ALT,left,movefocus,l
-bind=ALT,right,movefocus,r
-bind=ALT,up,movefocus,u
-bind=ALT,down,movefocus,d
+bind=,XF86Display,exec,wdisplays 
+ 
 
 bind=SUPER,left,movewindow,l
 bind=SUPER,right,movewindow,r
 bind=SUPER,up,movewindow,u
 bind=SUPER,down,movewindow,d
+bind=SUPERSHIFT,left,movefocus,l
+bind=SUPERSHIFT,right,movefocus,r
+bind=SUPERSHIFT,up,movefocus,u
+bind=SUPERSHIFT,down,movefocus,d
 
 # FOCUS WORKSPACES
-bind=SUPERALT,1,workspace,1
-bind=SUPERALT,2,workspace,2
-bind=SUPERALT,3,workspace,3
-bind=SUPERALT,4,workspace,4
-bind=SUPERALT,5,workspace,5
-bind=SUPERALT,6,workspace,6
-bind=SUPERALT,7,workspace,7
-bind=SUPERALT,8,workspace,8
-bind=SUPERALT,9,workspace,9
-bind=SUPERALT,0,workspace,10
-bind=SUPERALT,right,workspace,m+1
-bind=SUPERALT,left,workspace,m-1
-
-# FOCUS MONITORS
-bind=SUPERALT,up,focusmonitor,u
-bind=SUPERALT,down,focusmonitor,d
+bind=SUPER,1,workspace,1
+bind=SUPER,2,workspace,2
+bind=SUPER,3,workspace,3
+bind=SUPER,4,workspace,4
+bind=SUPER,5,workspace,5
+bind=SUPER,6,workspace,6
+bind=SUPER,7,workspace,7
+bind=SUPER,8,workspace,8
+bind=SUPER,9,workspace,9
+bind=SUPER,0,workspace,10
 
 # MOVING WINDOWS TO WS
-bind=SUPERSHIFT,exclam,movetoworkspacesilent,1
-bind=SUPERSHIFT,at,movetoworkspacesilent,2
-bind=SUPERSHIFT,numbersign,movetoworkspacesilent,3
-bind=SUPERSHIFT,dollar,movetoworkspacesilent,4
-bind=SUPERSHIFT,percent,movetoworkspacesilent,5
-bind=SUPERSHIFT,asciicircum,movetoworkspacesilent,6
-bind=SUPERSHIFT,ampersand,movetoworkspacesilent,7
-bind=SUPERSHIFT,asterisk,movetoworkspacesilent,8
-bind=SUPERSHIFT,parentleft,movetoworkspacesilent,9
-bind=SUPERSHIFT,parentright,movetoworkspacesilent,10
-bind=SUPERSHIFT,right,movetoworkspacesilent,+1
-bind=SUPERSHIFT,left,movetoworkspacesilent,-1
+bind=SUPERALT,1,movetoworkspace,1
+bind=SUPERALT,2,movetoworkspace,2
+bind=SUPERALT,3,movetoworkspace,3
+bind=SUPERALT,4,movetoworkspace,4
+bind=SUPERALT,5,movetoworkspace,5
+bind=SUPERALT,6,movetoworkspace,6
+bind=SUPERALT,7,movetoworkspace,7
+bind=SUPERALT,8,movetoworkspace,8
+bind=SUPERALT,9,movetoworkspace,9
+bind=SUPERALT,0,movetoworkspace,10
+bind=SUPERALT,right,movetoworkspace,m+1
+bind=SUPERALT,left,movetoworkspace,m-1
 
-# MOVING WINDOWS TO WS
-bind=SUPERALTCTRL,1,movetoworkspace,1
-bind=SUPERALTCTRL,2,movetoworkspace,2
-bind=SUPERALTCTRL,3,movetoworkspace,3
-bind=SUPERALTCTRL,4,movetoworkspace,4
-bind=SUPERALTCTRL,5,movetoworkspace,5
-bind=SUPERALTCTRL,6,movetoworkspace,6
-bind=SUPERALTCTRL,7,movetoworkspace,7
-bind=SUPERALTCTRL,8,movetoworkspace,8
-bind=SUPERALTCTRL,9,movetoworkspace,9
-bind=SUPERALTCTRL,0,movetoworkspace,10
-bind=SUPERALTCTRL,right,movetoworkspace,m+1
-bind=SUPERALTCTRL,left,movetoworkspace,m-1
-
-# MOVING WORKSPACES
-bind=SUPERCTRLSHIFT,down,movecurrentworkspacetomonitor,d
-bind=SUPERCTRLSHIFT,up,movecurrentworkspacetomonitor,u
-bind=SUPERCTRLSHIFT,left,movecurrentworkspacetomonitor,l
-bind=SUPERCTRLSHIFT,right,movecurrentworkspacetomonitor,r
-
-bind=SUPERSHIFT,S,workspaceopt,allfloat
+# Scratchpad
 bind=SUPERALT,minus,movetoworkspace,special
 bind=SUPER,minus,togglespecialworkspace,
-# bind=xf86audioraisevolume,exec,pactl set-sink-volume @DEFAULT_SINK@ +5%
 
-bind=SUPERCTRL,left,resizeactive,-20 0
-bind=SUPERCTRL,right,resizeactive,20 0
-bind=SUPERCTRL,up,resizeactive,0 -20
-bind=SUPERCTRL,down,resizeactive,0 20
+
+# Float - Unfloat
+bind=SUPERCTRL,Z,workspaceopt,allfloat
+bind=SUPERCTRL,X,workspaceopt,alltile
+bind=SUPERCTRL,SPACE,workspaceopt,togglesplit
+bind=SUPERCTRL,G,togglegroup
+
+# bind=xf86audioraisevolume,exec,pactl set-sink-volume @DEFAULT_SINK@ +5%
 
 # MEDIA keys
 bind=SUPERALT,space,exec,playerctl play-pause
@@ -262,44 +311,15 @@ bind=,XF86AudioPlay,exec,playerctl play-pause
 bind=,XF86AudioNext,exec,playerctl next
 bind=,XF86AudioPrev,exec,playerctl previous
 
-# SCREENSHOTS
-bind=,f11,exec,grim ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).webp && dunstify "Screenshot saved"  
-bind=,print,exec,grimshot save screen ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).webp && dunstify "Screenshot saved"  
-bind=SUPER,print,exec,grim -g "`~/bin/hyprland_get_current_window_coord.sh`" ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).webp && dunstify "Window-shot saved"
-bind=SUPERSHIFT,print,exec,grimshot save area ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).webp && dunstify "Section of screenshot saved"  
-bind=CONTROL,print,exec,grimshot copy screen && dunstify "Screen copied to clipboard"
-bind=SUPERCTRL,print,exec,grim -g "$(~/bin/hyprland_get_current_window_coord.sh)" - | wl-copy -t image/png && dunstify "Window copied to clipboard"
-bind=SUPERCTRLSHIFT,print,exec,grimshot copy area && dunstify "Screen part copied to clipboard"
+# Screenshot/Screen record
 
-# bind=SUPERSHIFT,greater,exec,wf-recorder -g "$(slurp)" -f ~/Movies/test.mp4
-# bind=SUPERSHIFT,lower,exec,
+bind=,print,exec,/home/langwsti/.bin/screenshot
+bind=SUPER,print,exec,screenrecord
 
-#WINDOW RULES
-windowrule=workspace 1 silent,kitty
-windowrule=workspace 1 silent,Subl
-windowrule=workspace 1 silent,Code
-windowrule=workspace 2 silent,Logseq
-windowrule=workspace 2 silent,Slack
-windowrule=workspace 3 silent,Mailspring
-windowrule=workspace 4 silent,firefox
-windowrule=workspace 4 silent,discord
-movecursortocorner,3
+exec-once=python3.10 /home/langwsti/code/smsportal/app.py
 
-# exec-once=kanshi
 exec-once=nm-applet --indicator
 exec-once=blueman-applet
-exec-once=exec xrdb -load ~/.Xresources
-exec-once=swaybg -i $wallpaper
-exec-once=swaync
-exec-once=~/Waybar/build/waybar --config ~/.config/waybar-hyprland/config --style ~/.config/waybar-hyprland/style.css
-
-exec-once=$term
-exec-once=$editor
-exec-once=$chat
-exec-once=$notetaker
+exec-once=waybar
 exec-once=$mailer
-exec-once=$browser
-exec-once=discord
-
-exec=hyprland_cleanup_after_startup.sh
-exec-once=hyprland_handle_monitor_connect.sh
+exec-once=remmina
