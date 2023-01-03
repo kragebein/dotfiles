@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo "Issue creation"
+
+read -p 'Summary: ' summary
+
+echo -e "Paste description (CTRL+D to end input):"
+read -d $'\04' description
+
+
+echo "${summary}"
+
+echo "${description}"
+
+export JIRA_API_TOKEN=samCDG48701
+export JIRA_AUTH_TYPE=basic
+
+echo "${description}" | jira issue create -tTask -s"${summary}" -pITC --web

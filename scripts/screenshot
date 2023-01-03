@@ -1,6 +1,6 @@
 #!/bin/bash
 
-storage="/home/krage/Pictures"
+storage="/home/langwsti/Pictures"
 name="$(date).png"
 newname="$(echo "$name" |sed -e 's/ /_/g')"
 file="$storage/$newname"

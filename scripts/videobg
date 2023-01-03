@@ -1,0 +1,3 @@
+#mpvpaper '*' "/home/langwsti/Downloads/Stars - 73478.mp4" -o "no-audio --loop"
+
+mpvpaper '*' "/home/krage/Videos/Concentric - 69577.mp4" -o "no-audio --loop"

@@ -1,0 +1,5 @@
+#!/usr/bin/bash
+CURPWD="$PWD"
+cd ~/code/
+python3.10 adminkey.py
+cd $CURPWD

@@ -1,0 +1,32 @@
+#!/bin/bash
+hyprpaper &
+
+picture_folder="/home/$USER/Pictures/.background"
+export old="$(cat /home/$USER/.config/hypr/hyprpaper.conf |grep wall | awk -F ',' '{print $2}')"
+
+function getimage(){
+    # Grabs a random image, makes sure its a jpeg before printing it.
+    file=$(find $picture_folder -type f | shuf -n1)
+    check=$(file $file | awk -F ' ' '{print $2}')
+    if [[ "$(echo $check)" == "JPEG" ]]; then
+        echo "$file"
+    else
+        getimage
+    fi
+}
+
+
+while true; do
+    sleep 120
+    # Preload another image:
+    export current=$(getimage)
+    if hyprctl hyprpaper preload $current; then
+        # Then set another image:
+        for x in $(hyprctl monitors |grep Monitor | awk -F ' ' '{print $2}'); do
+            hyprctl hyprpaper wallpaper $x,$current
+        done
+        # Unload the old image.
+        hyprctl hyprpaper unload $old
+    fi
+    export old=$current
+done
