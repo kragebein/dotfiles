@@ -1,18 +1,51 @@
 [{
     "layer": "top",
-    "output": ["DP-5", "eDP-1"],
+    "output": ["eDP-1", "eDP-2"],
     "position": "top",
-    "height": 35,
-    "spacing": 4,
-    "margin-top": 10,
+    "height": 20,
+    "spacing": 2,
     "margin-bottom":5,
 
     // Choose the order of the modules
 
-    "modules-left":[ "pulseaudio", "cpu", "memory", "temperature"],
+    "modules-left":[ "wlr/workspaces", "custom/activewindow" ],
     "modules-center": [ "clock", "custom/notification" ],
-    "modules-right":["custom/screenshot", "custom/updater", "keyboard-state",  "battery", "custom/vpn", "network", "tray"],
+    "modules-right":["custom/updater", "pulseaudio", "cpu", "memory", "temperature", "battery", "custom/vpn", "network", "tray"],
     // Modules configuration
+
+   "wlr/workspaces": {
+	"format": "{icon}",
+	"format-icons": {
+		"1": "①",
+		"2": "②",
+		"3": "③",
+		"4": "④",
+		"5": "⑤",
+		"6": "⑥",
+		"7": "⑦",
+		"8": "⑧",
+		"9": "⑨",
+		"10": "⑩",
+		"focused": "",
+		"default": ""
+	},
+	"sort-by-number": true,
+	"on-click": "activate",
+    },
+
+    "custom/launchar": {
+        "format": "",
+        "on-click-left": "launchar"
+    },
+
+    "custom/activewindow": {
+        "format": "{} ",
+        "return-type": "json",
+        "max-length": 150,
+        "escape": false,
+        "exec": "unbuffer $HOME/.config/hypr/monitor.py",
+        "tooltip": false
+    },
 
     "keyboard-state": {
         "numlock": true,
@@ -22,15 +55,6 @@
             "locked": "",
             "unlocked": ""
         }
-    },
-     "wlr/taskbar": {
-        "format": "{icon}",
-        "icon-size": 20,
-        "icon-theme": "Star",
-        "tooltip-format": "{title}",
-        "on-click": "minimize",
-        "on-click-middle": "close",
-        "on-click-right": "activate"
     },
    "sway/language": {
     "format": " {}"
@@ -47,7 +71,7 @@
         "spacing": 10
     },
     "clock": {
-        // "timezone": "America/New_York",
+        "timezone": "Europe/Oslo",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
         "format": "{:%d %b %H:%M}",
         "on-click-right": "gnome-calendar"
@@ -94,16 +118,16 @@
 
     },
     "pulseaudio": {
-        "format": "🕩 {volume}%",
-        "format-bluetooth": "🕩 {volume}% {icon}",
+        "format": " {volume}%",
+        "format-bluetooth": "🦷 {volume}% {icon}",
         "format-bluetooth-muted": "{icon} {format_source}",
-        "format-muted": "{format_source}",
+        "format-muted": "",
         "format-source": "",
         "format-source-muted": "",
         "format-icons": {
-            "headphone": "",
-            "hands-free": "",
-            "headset": "",
+            "headphone": "🎧",
+            "hands-free": "🎧",
+            "headset": "🎧",
             "phone": "",
             "portable": "",
             "car": "",
@@ -111,19 +135,7 @@
         },
         "on-click": "pavucontrol"
     },
-    "custom/vpn": {
-        "format": "{icon} {} ",
-        "return-type": "json",
-        "max-length": 15,
-        "format-icons": {
-            "online": " 🔒 ",
-            "offline": " ⦰ "
-        },
-        "escape": true,
-        "interval": 5,
-        "exec": "$HOME/code/pingtest.py",
-        "on-click": "ecsgtk"
-    },
+
     "custom/launcher":{
         "format": " ",
         "on-click": "rofi -show drun -theme ~/.config/rofi/wayfire/config.rasi",
@@ -136,12 +148,12 @@
     },
     "custom/screenshot":{
         "format": " ✂ ",
-        "on-click": "bash /home/krage/.bin/screenshot",
+        "on-click": "screenshot",
+	"on-click-right": "screenrecord"
     },
     "custom/updater":{
         "format": "  {} Updates",
         "exec": "checkupdates | wc -l",
-        "exec-if": "[[ $(checkupdates | wc -l) != 0 ]]",
         "interval": 15,
         "on-click": "pamac-manager"
     },
@@ -149,10 +161,10 @@
         "tooltip": false,
         "format": "{icon}",
         "format-icons": {
-          "notification": "  <span foreground='red'><sup>① </sup></span>",
-          "none": "  ",
-          "dnd-notification": "  <span foreground='red'><sup>① /sup></span>",
-          "dnd-none": "  "
+          "notification": " <span foreground='red'><sup>① </sup></span>",
+          "none": " ",
+          "dnd-notification": " <span foreground='red'><sup>① /sup></span>",
+          "dnd-none": " "
         },
         "return-type": "json",
         "exec-if": "which swaync-client",
@@ -163,58 +175,5 @@
       }
 },
  // The two other monitors
-{
-   "layer": "top",
-    "position": "bottom",
-    "height": 35,
-    "spacing": 4,
-    "margin-top": 10,
-    "margin-bottom":5,
-
-    "modules-center": [ "custom/media","wlr/taskbar", "custom/power", "wlr/workspaces"],
-
-     "wlr/taskbar": {
-        "format": "{icon}",
-        "icon-size": 20,
-        "icon-theme": "Star",
-        "tooltip-format": "{title}",
-        "on-click": "minimize",
-        "on-click-middle": "close",
-        "on-click-right": "activate"
-    },
-    "custom/power":{
-        "format": "  ",
-        "on-click": "nemo",
-        "on-click-right": "wlogout"
-    },
-
-      "custom/media": {
-        "format": "{icon} {}",
-        "return-type": "json",
-        "max-length": 15,
-        "format-icons": {
-            "spotify": " ",
-            "default": " "
-        },
-        "escape": true,
-        "exec": "$HOME/.config/system_scripts/mediaplayer.py 2> /dev/null",
-        "on-click": "playerctl play-pause"
-    },
- // Modules configuration
-   "wlr/workspaces": {
-        "disable-scroll": true,
-        "all-outputs": true,
-        "format": "{name}: {icon}",
-        "format-icons": {
-            "1": "",
-            "2": "",
-            "3": "",
-            "4": "",
-            "5": "",
-            "urgent": "",
-            "focused": "",
-            "default": ""
-        }
-    },
-}
+{ }
 ]
