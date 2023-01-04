@@ -1,0 +1,8 @@
+#!/bin/bash 
+
+swayidle \
+	timeout 300 "$1" \
+	timeout 350 'hyprctl dispatch dpms off' \
+	resume 'hyprctl dispatch dpms on'
+
+#swayidle -w timeout 300 'gtklock' timeout 400 'hyprctl dispatch dpms off' resume 'hyprctl dispatch dpms on' before-sleep 'gtklock'
